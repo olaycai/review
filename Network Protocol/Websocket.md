@@ -45,11 +45,9 @@ Sec-WebSocket-Accept: HSmrc0sMlYUkAGmm5OPpG2HaGWk=
 Sec-WebSocket-Protocol: chat
 ```
 
-
 Sec-WebSocket-Accept表示我已经接受你的握手啦，这是我加密后的密钥。
 
 Sec-WebSocket-Protocol则表示服务器最终接受的子协议
-
 
 3. 数据传输
 
