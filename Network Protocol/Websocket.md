@@ -1,10 +1,10 @@
-#Websocket
+# Websocket
 > WebSocket协议是基于TCP的一种新的网络协议。它实现了浏览器与服务器全双工(full-duplex)通信——允许服务器主动发送信息给客户端。 引用自百度百科
 
-##与http的关系
+## 与http的关系
 可以说是http的补充升级包。握手时使用http进行握手请求，握手后的数据传输就走tcp通道传输
 
-![pic](images/websocket.png)
+![pic](../images/websocket.png)
 - 相同点：
 都是基于http协议经行的握手
 - 不同点：
