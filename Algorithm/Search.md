@@ -56,3 +56,93 @@ function sort($arr, $target, $lastIndex = 0) {
     return sort($cutArr, $target, $lastIndex);
 }
 ```
+另一个实现方法
+```php
+/**
+ * 二分查找（下标法）
+ *
+ * @param Array $array
+ * @param int $target
+ * @return int
+ */
+function sort($array, $target) {
+
+    $start = 0;
+    $end = count($array) - 1;
+
+    // 判断是否头尾是查找目标
+    if ($target == $array[$start]) {
+        return $start;
+    }
+    if ($target == $array[$end]) {
+        return $end;
+    }
+
+    while ($start <= $end) {
+        $middle = floor(($start + $end) / 2);
+        if ($target == $array[$middle]) {
+            return $middle;
+        }
+
+        if ($target > $array[$middle]) {
+            $start = $middle + 1;
+        } else {
+            $end = $middle - 1;
+        }
+    }
+
+    return -1;
+}
+```
+
+## 插值查找
+这种方法是二分查找演变而来的，二分法是无脑的一直对半分，插值是算出大概位置作为分段依据。
+
+```php
+$arr = [1, 10, 39, 48, 69, 83, 97, 101];
+$target = 97;
+
+echo sortTest($arr, $target);
+
+/**
+ * 插值查找（下标法）
+ *
+ * @param Array $array
+ * @param int $target
+ * @return int
+ */
+function sortTest($array, $target) {
+
+    $start = 0;
+    $end = count($array) - 1;
+
+    // 判断是否头尾是查找目标
+    if ($target == $array[$start]) {
+        return $start;
+    }
+    if ($target == $array[$end]) {
+        return $end;
+    }
+
+    while ($start <= $end) {
+        // 把有序元素分为(101 - 1)份，算出target大概在这个数中的百分之几的位置，然后用这个百分比乘以元素的个数
+        // （97 - 1） / (101 -1) = 96%   下标为7的元素96%的位置是6(6.72向下取整)
+        $middle = $start + ($target - $array[$start]) / ($array[$end] - $array[$start]) * ($end - $start);
+        $middle = floor($middle);
+        if ($target == $array[$middle]) {
+            return $middle;
+        }
+
+        if ($target > $array[$middle]) {
+            $start = $middle + 1;
+        } else {
+            $end = $middle - 1;
+        }
+    }
+
+    return -1;
+}
+```
+
+- 注意:
+如果被查找的元素密度较密（数字跨度不大）则此算法比二分法高效。上例中只需要查找一次就能找到，如果最后一个改成1001则需要运行多次才能找到
