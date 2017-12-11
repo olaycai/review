@@ -36,4 +36,101 @@ function bubbleSort($array, $type = 'asc') {
 }
 ```
 
-## 
+## 快速排序
+原理是首先把第一个元素当作一个参考的key，然后根据这个key把待排的元素分为2部分key左边是比key小的元素，key的右边是比key大的元素。然后左边
+和右边的两组分别再用第一个元素当作key，再分为2部分，一直循环直到数组大小为1为止。此排序算法为不稳定算法
+
+```php
+$arr = [28, 38, 1, 23, 80, 46, 58, 101, 94, 44, 2, 88];
+$test = quickSort($arr);
+print_r($test);
+
+/**
+ * 快速排序
+ *
+ * @param array $array 待排数组
+ * @return array 返回排好序的数组
+ */
+function quickSort($array) {
+
+    if (count($array) <= 1) {
+        return $array;
+    }
+
+    $key = array_shift($array);
+    $leftArr = [];
+    $rightArr = [];
+    foreach ($array as $num) {
+        if ($num <= $key) {
+            $leftArr[] = $num;
+        }
+        if ($num > $key) {
+            $rightArr[] = $num;
+        }
+    }
+    $leftArr = quickSort($leftArr);
+    $rightArr = quickSort($rightArr);
+
+    return array_merge($leftArr, [$key], $rightArr);
+}
+```
+
+## 选择排序
+原理为每一次都选择待排序列中最小的元素放在第一位，然后再在剩下的数组中找最小的放在第二位，以此类推到找到倒数第二个与第一个元素比较位置。
+此算法是不稳定排序
+
+```php
+$arr = [28, 38, 1, 23, 80, 46, 58, 101, 94, 44, 2, 88];
+$test = selectSort($arr);
+print_r($test);
+
+/**
+ * 选择排序
+ *
+ * @param array $array 待排数组
+ * @return array 返回排好序的数组
+ */
+function selectSort($array, &$sort = []) {
+
+    for ($i = 0; $i < count($array); $i++) {
+        $min = $i;
+        
+        // 查找最小元素的下标
+        for ($j = $i + 1; $j < count($array); $j++) {
+            if ($array[$min] > $array[$j]) {
+                $min = $j;
+            }
+        }
+        // 如果最小下标改变，则交换数据
+        if ($min != $i) {
+            $tmp = $array[$i];
+            $array[$i] = $array[$min];
+            $array[$min] = $tmp;
+        }
+    }
+
+    return $array;
+}
+
+/**
+ * 选择排序(递归简洁版)
+ *
+ * @param array $array 待排数组
+ * @param array $sort 记录数组
+ * @return array 返回排好序的数组
+ */
+function selectSort($array, $sort = []) {
+    if (count($array) <= 0) {
+        return $sort;
+    }
+    
+    // 找到最小的元素
+    $min = min($array);
+    $minKey = array_search($min, $array);
+    unset($array[$minKey]);
+
+    $sort[] = $min;
+
+    return selectSort($array, $sort);
+}
+```
