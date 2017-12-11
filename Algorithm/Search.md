@@ -16,12 +16,12 @@ foreach($arr as $index => $number) {
 
 ## 二分查找
 这种查找前提是待查找的元素列表必须为有序的元素，然后每次查找都把列表分两半，大于中间的数则在右半段找，小于则在左半段找，不断重复只到找到
-目标或者为空为止
+目标或者为空为止，时间复杂度为log2n
 
 ```php
 $arr = [1, 10, 39, 48, 69, 83, 97, 101];
 $target = 101;
-$test = sort($arr, $target);
+$test = search($arr, $target);
 echo $test;
 
 /**
@@ -32,7 +32,7 @@ echo $test;
  * @param int $lastIndex
  * @return int
  */
-function sort($arr, $target, $lastIndex = 0) {
+function search($arr, $target, $lastIndex = 0) {
     $arrLength = count($arr);
     if ($arrLength == 1) {
         return $arr[0] === $target ? $lastIndex : -1;
@@ -65,7 +65,7 @@ function sort($arr, $target, $lastIndex = 0) {
  * @param int $target
  * @return int
  */
-function sort($array, $target) {
+function search($array, $target) {
 
     $start = 0;
     $end = count($array) - 1;
@@ -102,7 +102,7 @@ function sort($array, $target) {
 $arr = [1, 10, 39, 48, 69, 83, 97, 101];
 $target = 97;
 
-echo sortTest($arr, $target);
+echo search($arr, $target);
 
 /**
  * 插值查找（下标法）
@@ -111,7 +111,7 @@ echo sortTest($arr, $target);
  * @param int $target
  * @return int
  */
-function sortTest($array, $target) {
+function search($array, $target) {
 
     $start = 0;
     $end = count($array) - 1;
