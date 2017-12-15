@@ -262,6 +262,62 @@ class BinarySortTree {
             $this->rightChild->insert($node);
         }
     }
+    
+    /**
+     * 查找节点
+     *
+     * @param int $key
+     * @return BinarySortTree
+     */
+    public function findNode($key)
+    {
+        // 找到最后一个元素都没有，则返回null
+        if ($this->isLeaf($this) && $this->key != $key) {
+            return null;
+        }
+        // 找到数据则返回
+        if ($this->key == $key) {
+            return $this;
+        }
+
+        // 根据key值寻找查找的路线
+        if ($this->key > $key) {
+            return $this->leftChild->findNode($key);
+        } else {
+            return $this->rightChild->findNode($key);
+        }
+
+    }
+
+    /**
+     * 判断是否为叶子节点
+     *
+     * @param BinarySortTree $node
+     * @return bool
+     */
+    protected function isLeaf($node)
+    {
+        return empty($node->leftChild->key) && empty($node->rightChild->key);
+    }
+
+    /**
+     * 删除节点
+     *
+     * @param int $node
+     * @return void
+     */
+    public function deleteNode($node)
+    {
+        $tree = $this->findNode($node);
+        if ($this->isLeaf($tree)) {
+            // 如果是叶子节点，直接删除
+            $tree->key = null;
+            $tree->leftChild = null;
+            $tree->rightChild = null;
+            return;
+        }
+
+    }
 }
 
 $arr = [16, 38, 8, 12, 46, 58, 22, 40];
