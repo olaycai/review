@@ -299,6 +299,22 @@ class BinarySortTree {
     {
         return empty($node->leftChild->key) && empty($node->rightChild->key);
     }
+    
+    /**
+     * 查找最小的节点
+     *
+     * @param BinarySortTree $parent
+     * @return BinarySortTree
+     */
+    public function findMin(&$parent)
+    {
+        if ($this->isLeaf($this)) {
+            return $this;
+        }
+        $parent = $this;
+        return $parent->leftChild->findMin($parent);
+    }
+
 
     /**
      * 删除节点
@@ -317,6 +333,24 @@ class BinarySortTree {
             return;
         }
 
+        // 如果被删节点的子树只有一个则当前被删除节点直接替换为子节点
+        if (empty($tree->leftChild->key) || empty($tree->rightChild->key)) {
+            $target = empty($tree->leftChild->key) ? $tree->rightChild : $tree->leftChild;
+            $tree->key = $target->key;
+            $tree->leftChild = $target->leftChild;
+            $tree->rightChild = $target->rightChild;
+            return;
+        }
+
+        // 既有左子树又有右子树
+        if (!empty($tree->leftChild->key) && !empty($tree->rightChild->key)) {
+            // 第一步先找到右孩子中最小的节点(即右孩子中最左边的节点)
+            $minNode = $tree->rightChild->findMin($minNodeParent);
+            // 第二步把找到的节点替换为要删除的节点，并删除找到的节点
+            $tree->key = $minNode->key;
+            $minNodeParent->leftChild = null;
+            return;
+        }
     }
 }
 
@@ -325,4 +359,7 @@ $tree = new BinarySortTree();
 foreach ($arr as $node) {
     $tree->insert($node);
 }
+$tree->deleteNode(38);
+midOrder($tree, $order);
+print_r($order);
 ```
