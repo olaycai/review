@@ -451,3 +451,317 @@ print_r($order);
       /            \
      9              10
 ```
+
+```php
+class Node {
+
+    /**
+     * 数值
+     *
+     * @var int
+     */
+    public $data = null;
+
+    /**
+     * 左孩子
+     *
+     * @var Node
+     */
+    public $leftChild = null;
+
+    /**
+     * 右孩子
+     *
+     * @var Node
+     */
+    public $rightChild = null;
+
+    /**
+     * 平衡因子
+     *
+     * @var int
+     */
+    public $balanceFactor = 0;
+
+    /**
+     * 构造函数
+     *
+     * @param int $value
+     */
+    public function __construct($value)
+    {
+        $this->data = $value;
+    }
+
+}
+
+class AVLTree {
+
+    /**
+     * 左子树高
+     *
+     * @var int
+     */
+    const LEFT_HEIGHT = -1;
+
+    /**
+     * 右子树高
+     *
+     * @var int
+     */
+    const RIGHT_HEIGHT = 1;
+
+    /**
+     * 左右等高
+     *
+     * @var int
+     */
+    const SAME_HEIGHT = 0;
+
+    /**
+     * 根节点
+     *
+     * @var Node
+     */
+    public $root = null;
+
+    public function init($arr)
+    {
+        foreach($arr as $data) {
+            $this->insert($this->root, $data);
+        }
+    }
+
+    /**
+     * 插入节点
+     *
+     * @param Node $node
+     * @param int $value
+     * @return mixed
+     */
+    private function insert(&$node, $value, &$test = 0)
+    {
+        if (empty($node)) {
+            $node = new Node($value);
+            return;
+        }
+        if ($node->data > $value) {
+            $this->insert($node->leftChild, $value, $test);
+            switch($node->balanceFactor) {
+                case self::SAME_HEIGHT:
+                    // 未增加此节点时等高，则更改为左子树高(因为插入的是左边孩子)
+                    $node->balanceFactor = self::LEFT_HEIGHT;
+                    break;
+                case self::LEFT_HEIGHT:
+                    // 未增加此节点时，左子树比较高则进行左边平衡操作
+                    $this->leftBalance($node);
+                    break;
+                case self::RIGHT_HEIGHT:
+                    $node->balanceFactor = self::SAME_HEIGHT;
+                    break;
+            }
+        } else {
+            $this->insert($node->rightChild, $value, $test);
+            switch($node->balanceFactor) {
+                case self::SAME_HEIGHT:
+                    // 未增加此节点时等高，则更改为右子树高(因为插入的是右边孩子)
+                    $node->balanceFactor = self::RIGHT_HEIGHT;
+                    break;
+                case self::LEFT_HEIGHT:
+                    $node->balanceFactor = self::SAME_HEIGHT;
+                    break;
+                case self::RIGHT_HEIGHT:
+                    // 未增加此节点时，左子树比较高则进行右边平衡操作
+                    $this->rightBalance($node);
+                    break;
+            }
+        }
+
+    }
+
+    /**
+     * 左边平衡衡操作
+     *
+     * @param Node $node
+     * @return void
+     */
+    public function leftBalance(&$node)
+    {
+        // 暂存节点
+        $leftChild = $node->leftChild;
+
+        // 判断是左左还是左右情况
+        switch ($leftChild->balanceFactor) {
+            // 左左情况
+            case self::LEFT_HEIGHT:
+                // 左旋转
+                $this->rightRotate($node);
+                break;
+            // 左右情况
+            case self::RIGHT_HEIGHT:
+                // 先左旋再右旋
+                $this->leftRotate($leftChild);
+                $node->leftChild = $leftChild;
+
+                // 调整完后再右旋一次
+                $this->rightRotate($node);
+                break;
+        }
+    }
+
+    /**
+     * 右旋转
+     *
+     * @param Node $node
+     * @return void
+     */
+    public function rightRotate(&$node)
+    {
+        // 暂存节点
+        $tmp = $node;
+        $leftChild = $tmp->leftChild;
+
+        // 节点左孩子替换原节点
+        $node = $leftChild;
+
+        // 原节点的左孩子设置为空
+        $tmp->leftChild = null;
+        if (($tmp->leftChild == null && $tmp->rightChild == null) || ($tmp->leftChild != null && $tmp->rightChild != null)) {
+            $tmp->balanceFactor = self::SAME_HEIGHT;
+        } else if ($tmp->leftChild == null) {
+            $tmp->balanceFactor = self::RIGHT_HEIGHT;
+        } else {
+            $tmp->balanceFactor = self::LEFT_HEIGHT;
+        }
+
+        // 替换后的节点右孩子连接原节点
+        $node->rightChild = $tmp;
+        // 设置平衡因子
+        $node->balanceFactor = self::SAME_HEIGHT;
+    }
+
+    /**
+     * 左旋转
+     *
+     * @param Node $node
+     * @return void
+     */
+    public function leftRotate(&$node)
+    {
+        // 暂存节点
+        $tmp = $node;
+        $rightChild = $tmp->rightChild;
+
+        $node = $rightChild;
+        // 原节点右孩子替换为原节点右孩子
+        $tmp->rightChild = $node->leftChild;
+        if (($tmp->leftChild == null && $tmp->rightChild == null) || ($tmp->leftChild != null && $tmp->rightChild != null)) {
+            $tmp->balanceFactor = self::SAME_HEIGHT;
+        } else if ($tmp->leftChild == null) {
+            $tmp->balanceFactor = self::RIGHT_HEIGHT;
+        } else {
+            $tmp->balanceFactor = self::LEFT_HEIGHT;
+        }
+
+        $node->leftChild = $tmp;
+        $node->balanceFactor = self::SAME_HEIGHT;
+    }
+
+    /**
+     * 右边平衡操作
+     *
+     * @param Node $node
+     * @return void
+     */
+    public function rightBalance(&$node)
+    {
+        // 暂存节点
+        $rightChild = $node->rightChild;
+        // 判断是右左情况还是右右情况
+        switch ($rightChild->balanceFactor) {
+            // 右右情况
+            case self::RIGHT_HEIGHT:
+                // 左旋转
+                $this->leftRotate($node);
+                break;
+            // 右左情况
+            case self::LEFT_HEIGHT:
+                // 先右旋再左旋
+                $this->rightRotate($rightChild);
+                $node->rightChild = $rightChild;
+
+                $this->leftRotate($node);
+                break;
+        }
+    }
+
+    /**
+     * 查找节点
+     *
+     * @param Node $node
+     * @param int $value
+     * @return Node
+     */
+    public function &find(&$node, $value)
+    {
+        if ($node->data == $value) {
+            return $node;
+        }
+        if ($node->data > $value) {
+            return $this->find($node->leftChild, $value);
+        } else {
+            return $this->find($node->rightChild, $value);
+        }
+
+        return null;
+    }
+
+    /**
+     * 获取最小的节点
+     *
+     * @param Node $node
+     * @return Node
+     */
+    public function &findMin(&$node)
+    {
+        if (empty($node->leftChild)) {
+            return $node;
+        }
+        return $this->findMin($node);
+    }
+
+    /**
+     * 删除节点
+     *
+     * @param int $value
+     * @return bool
+     */
+    public function deleteNode($value)
+    {
+        // 找到该节点的引用
+        $node = &$this->find($this->root, $value);
+        if (empty($node)) {
+            return false;
+        }
+        if (empty($node->leftChild)) {
+            // 如果没有左孩子，则直接把右孩子作为父节点
+            $node = $node->rightChild;
+        } else if (empty($node->rightChild)) {
+            // 如果没有右孩子，则直接把左孩子作为父节点
+            $node = $node->leftChild;
+        } else {
+            // 既有左孩子又有右孩子
+            // 找到被删除的节点的右孩子中的最小节点
+            $minNode = &$this->findMin($node->rightChild);
+            // 最小节点值替换为父节点值
+            $node->data = $minNode->data;
+            // 删掉最小节点
+            $minNode = null;
+        }
+    }
+}
+
+$avlTree = new AVLTree();
+$avlTree->init([4, 2, 12, 34, 8, 22]);
+print_r($avlTree->root);
+```
